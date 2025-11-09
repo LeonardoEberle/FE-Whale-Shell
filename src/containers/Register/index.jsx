@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { UserIcon, EnvelopeIcon, LockIcon } from '../../assets/icons.jsx'
+import { authApi } from '../../services/api.js'
 
 export default function Register() {
   const [firstName, setFirstName] = useState('')
@@ -9,15 +10,28 @@ export default function Register() {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [ok, setOk] = useState(false)
+  const navigate = useNavigate()
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    setError('')
+    setOk(false)
     if (password !== confirm) {
-      alert('As senhas não coincidem')
+      setError('As senhas não coincidem')
       return
     }
     setLoading(true)
-    setTimeout(() => setLoading(false), 800)
+    try {
+      await authApi.register({ nome: firstName, sobrenome: lastName, email, senha: password })
+      setOk(true)
+      setTimeout(() => navigate('/login'), 800)
+    } catch (err) {
+      setError(err.message || 'Falha no cadastro')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -25,6 +39,8 @@ export default function Register() {
       <div className="login-card">
         <h1 className="login-title">Cadastro</h1>
         <form className="login-form" onSubmit={handleSubmit}>
+          {error && <div className="error-banner">{error}</div>}
+          {ok && <div className="success-banner">Conta criada com sucesso!</div>}
           <label className="field">
             <span>Nome</span>
             <div className="input with-icon">

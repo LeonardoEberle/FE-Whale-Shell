@@ -1,16 +1,35 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { EnvelopeIcon, LockIcon } from '../../assets/icons.jsx'
+import { authApi } from '../../services/api.js'
+import { useAuth } from '../../context/AuthContext.jsx'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const { setToken, setUserEmail } = useAuth()
+  const navigate = useNavigate()
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    setError('')
     setLoading(true)
-    setTimeout(() => setLoading(false), 800)
+    try {
+      const res = await authApi.login(email, password)
+      if (res?.token) {
+        setToken(res.token)
+        setUserEmail(email)
+        navigate('/dashboard')
+      } else {
+        setError('Resposta inesperada do servidor')
+      }
+    } catch (err) {
+      setError(err.message || 'Falha no login')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -18,6 +37,7 @@ export default function Login() {
       <div className="login-card">
         <h1 className="login-title">Login</h1>
         <form className="login-form" onSubmit={handleSubmit}>
+          {error && <div className="error-banner">{error}</div>}
           <label className="field">
             <span>Email</span>
             <div className="input with-icon">
@@ -55,8 +75,8 @@ export default function Login() {
             <span>Ou continue sem cadastro:</span>
           </div>
 
-          <Link className="btn btn-secondary" to="/dashboard">
-            Continuar Anonimamente
+          <Link className="btn btn-secondary" to="/register">
+            Criar uma conta
           </Link>
         </form>
       </div>

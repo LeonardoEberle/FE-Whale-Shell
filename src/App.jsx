@@ -5,6 +5,7 @@ import Register from './containers/Register/index.jsx'
 import Dashboard from './containers/Dashboard/index.jsx'
 import Wallet from './containers/Wallet/index.jsx'
 import Profile from './containers/Profile/index.jsx'
+import ProtectedLayout from './components/ProtectedLayout.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 
 function PrivateRoute({ children }) {
@@ -21,9 +22,13 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
-          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+
+          <Route element={<PrivateRoute><ProtectedLayout /></PrivateRoute>}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

@@ -8,6 +8,11 @@ export async function apiFetch(path, { method = 'GET', body, token } = {}) {
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
+  if (res.status === 401) {
+    try {
+      window.dispatchEvent(new CustomEvent('auth:logout', { detail: { reason: 'unauthorized' } }));
+    } catch (_) { /* noop */ }
+  }
   const isJson = res.headers.get('content-type')?.includes('application/json');
   const data = isJson ? await res.json() : await res.text();
   if (!res.ok) {

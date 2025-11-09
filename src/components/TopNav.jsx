@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { HomeIcon, WalletIcon, UserIcon, SunIcon, MoonIcon } from '../assets/icons.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
-export default function TopNav({ userName = 'Anônimo' }) {
+export default function TopNav({ userName }) {
+  const navigate = useNavigate()
+  const { userEmail, userName: nameFromCtx, logout } = useAuth()
   const [theme, setTheme] = useState(
     typeof document !== 'undefined'
       ? document.documentElement.getAttribute('data-theme') || 'dark'
@@ -15,6 +18,11 @@ export default function TopNav({ userName = 'Anônimo' }) {
 
   function toggleTheme() {
     setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+  }
+
+  function handleLogout() {
+    logout()
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -32,7 +40,7 @@ export default function TopNav({ userName = 'Anônimo' }) {
       <div className="topnav-right">
         <Link to="/profile" className="topnav-user" aria-label="Abrir perfil">
           <span className="icon" aria-hidden="true"><UserIcon /></span>
-          <span>{userName}</span>
+          <span>{userName || nameFromCtx || userEmail || 'Usuário'}</span>
         </Link>
 
         <button className="theme-toggle" onClick={toggleTheme} aria-label="Alternar tema">
@@ -41,7 +49,7 @@ export default function TopNav({ userName = 'Anônimo' }) {
           </span>
         </button>
 
-        <Link to="/login" className="topnav-link" aria-label="Sair">Sair</Link>
+        <button className="topnav-link" onClick={handleLogout} aria-label="Sair">Sair</button>
       </div>
     </div>
   )

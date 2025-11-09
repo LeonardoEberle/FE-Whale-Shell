@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { EnvelopeIcon, LockIcon } from '../../assets/icons.jsx'
-import { authApi } from '../../services/api.js'
+import { authApi, usuariosApi } from '../../services/api.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 export default function Login() {
@@ -9,8 +9,21 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { setToken, setUserEmail } = useAuth()
+  const { setToken, setUserEmail, setUserName } = useAuth()
   const navigate = useNavigate()
+
+  function decodeJwtPayload(token) {
+    try {
+      const base64Url = token.split('.')[1]
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      }).join(''))
+      return JSON.parse(jsonPayload)
+    } catch (_) {
+      return null
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -21,6 +34,18 @@ export default function Login() {
       if (res?.token) {
         setToken(res.token)
         setUserEmail(email)
+        // Buscar nome do usuário após login
+        const payload = decodeJwtPayload(res.token)
+        const usuId = payload?.usu_id
+        if (usuId) {
+          try {
+            const user = await usuariosApi.getById(usuId, res.token)
+            const nomeCompleto = [user?.nome, user?.sobrenome].filter(Boolean).join(' ').trim()
+            if (nomeCompleto) setUserName(nomeCompleto)
+          } catch (_) {
+            // se falhar, mantém email
+          }
+        }
         navigate('/dashboard')
       } else {
         setError('Resposta inesperada do servidor')

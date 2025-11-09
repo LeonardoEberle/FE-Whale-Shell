@@ -37,5 +37,8 @@ export const usuariosApi = {
   },
   async getById(id, token) {
     return apiFetch(`/api/usuarios/${id}`, { method: 'GET', token });
+  },
+  async update(id, body, token) {
+    return apiFetch(`/api/usuarios/${id}`, { method: 'PUT', body, token });
   }
 };

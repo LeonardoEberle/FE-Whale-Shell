@@ -22,7 +22,6 @@ export default function TopNav({ userName }) {
 
   function handleLogout() {
     logout()
-    navigate('/login', { replace: true })
   }
 
   return (
@@ -49,7 +48,7 @@ export default function TopNav({ userName }) {
           </span>
         </button>
 
-        <button className="topnav-link" onClick={handleLogout} aria-label="Sair">Sair</button>
+        <Link to="/login" replace className="topnav-link" onClick={handleLogout} aria-label="Sair">Sair</Link>
       </div>
     </div>
   )

@@ -1,0 +1,210 @@
+#root {
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: initial;
+}
+
+/* Tema por variáveis */
+:root {
+  --bg: #103a46;
+  --grad1: rgba(86, 144, 160, 0.25);
+  --grad2: rgba(40, 110, 135, 0.18);
+  --card-bg: rgba(17, 49, 62, 0.78);
+  --card-border: rgba(255,255,255,0.14);
+  --text: #e8f3f8;
+  --icon: #a8d0ff;
+  --pill-bg: rgba(33,86,106,0.55);
+  --pill-border: rgba(255,255,255,0.18);
+}
+[data-theme="light"] {
+  --bg: #e9f3f8;
+  --grad1: rgba(140, 200, 220, 0.25);
+  --grad2: rgba(110, 180, 210, 0.18);
+  --card-bg: rgba(255,255,255,0.85);
+  --card-border: rgba(0,0,0,0.08);
+  --text: #17333f;
+  --icon: #2e86f5;
+  --pill-bg: rgba(240, 248, 255, 0.75);
+  --pill-border: rgba(0,0,0,0.08);
+}
+
+.login-page {
+  background: radial-gradient(1200px 600px at 30% 10%, var(--grad1), transparent),
+              radial-gradient(900px 500px at 80% 80%, var(--grad2), transparent),
+              var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.login-card {
+  width: clamp(420px, 38vw, 640px);
+  max-width: 92vw;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow:
+    0 18px 36px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  padding: 1.6rem;
+  color: var(--text);
+}
+
+.login-title {
+  margin: 0 0 1rem 0;
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+.login-form { display: grid; gap: 0.9rem; }
+
+.field { display: grid; gap: 0.4rem; }
+.field span { font-size: 0.85rem; opacity: 0.9; }
+
+.input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(12, 36, 46, 0.86);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  min-height: 46px;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.25);
+}
+
+.input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #eaf4f9;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+/* Estado de foco mais sutil, sem borda grossa */
+.input:focus-within {
+  border-color: rgba(85, 183, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(85, 183, 255, 0.16), inset 0 1px 1px rgba(0,0,0,0.25);
+}
+
+/* Reset de aparência nativa para evitar bordas padrão do navegador */
+input, textarea, select, button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.icon { opacity: 0.85; }
+.icon svg { width: 18px; height: 18px; display: block; color: var(--icon); }
+
+/* Top Navigation */
+.topnav {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1100px, calc(100% - 32px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(46, 123, 155, 0.35), var(--pill-bg));
+  border: 1px solid var(--pill-border);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  z-index: 20;
+}
+
+/* Páginas com TopNav fixo: dar respiro do topo */
+.page-with-topnav { padding-top: 7rem; }
+.topnav-left, .topnav-right { display: flex; align-items: center; gap: 1.4rem; }
+.topnav-link { color: var(--text); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+.topnav-link:hover { filter: brightness(1.1); }
+.topnav-user { display: flex; align-items: center; gap: 0.5rem; color: var(--text); opacity: 0.95; }
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border-radius: 9999px;
+  border: 1px solid var(--pill-border);
+  background: rgba(255,255,255,0.12);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 200ms ease;
+}
+.theme-toggle:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+.theme-toggle:active { transform: translateY(0); }
+
+.btn {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 0.8rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 200ms ease, filter 200ms ease, background 200ms ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #55b7ff, #2e86f5);
+  color: #fff;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(46,134,245,0.35); filter: brightness(1.06); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 4px 12px rgba(46,123,242,0.25); filter: brightness(0.98); }
+.btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(77,143,255,0.45); }
+.btn-primary:disabled { opacity: 0.7; cursor: default; }
+
+.btn-secondary {
+  background: rgba(255,255,255,0.10);
+  color: #d8e8f2;
+}
+.btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+.btn-secondary:active { transform: translateY(0); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+.btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(168,208,255,0.35); }
+
+.login-links {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+.login-links a { color: #a8d0ff; }
+
+/* Motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+  .btn-primary:hover, .btn-secondary:hover { transform: none; }
+}
+
+/* Responsividade: breakpoints menores */
+@media (max-width: 720px) {
+  .login-card { width: 380px; padding: 1.2rem; }
+  .login-title { font-size: 1.25rem; }
+}
+@media (max-width: 480px) {
+  .login-card { width: 340px; padding: 1rem; border-radius: 12px; }
+  .login-form { gap: 0.75rem; }
+  .input { padding: 0.5rem 0.65rem; }
+  .btn { padding: 0.65rem 0.9rem; font-size: 0.9rem; }
+}
+@media (max-width: 360px) {
+  .login-card { width: 310px; }
+  .login-title { font-size: 1.1rem; }
+  .input input { font-size: 0.9rem; }
+}
+
+/* Desktop refinements: ocupar melhor o espaço em telas grandes */
+@media (min-width: 1024px) {
+  .login-page { padding: 4rem 2rem; }
+  .login-card { padding: 2rem; border-radius: 16px; }
+  .login-title { font-size: 1.6rem; }
+}
+@media (min-width: 1440px) {
+  .login-card { width: clamp(560px, 32vw, 720px); }
+}

@@ -1,4 +1,8 @@
-const BASE_URL = import.meta.env.VITE_MS_AUTH_URL || 'http://localhost:8080';
+// Prefer VITE_API_BASE_URL (produção) e fallback para VITE_MS_AUTH_URL (dev)
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_MS_AUTH_URL ||
+  'http://localhost:8080';
 
 export async function apiFetch(path, { method = 'GET', body, token } = {}) {
   const headers = { 'Content-Type': 'application/json' };

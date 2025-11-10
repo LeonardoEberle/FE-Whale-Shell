@@ -1,10 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
-import { usuariosApi } from '../../services/api.js'
 import { getQuotes } from '../../services/market.js'
 
 function CryptoPricesWidget() {
-  const symbols = useMemo(() => ['BTCUSDT','ETHUSDT','SOLUSDT','ADAUSDT','MATICUSDT','XRPUSDT'], [])
+  const symbols = useMemo(() => [
+    'BTCUSDT',
+    'ETHUSDT',
+    'SOLUSDT',
+    'ADAUSDT',
+    'MATICUSDT',
+    'XRPUSDT',
+    'DOGEUSDT',
+    'DOTUSDT',
+    'AVAXUSDT',
+    'LINKUSDT',
+    'LTCUSDT',
+    'TRXUSDT'
+  ], [])
   const [state, setState] = useState({ quotes: [], partial: false, lastAt: null })
   const [err, setErr] = useState('')
 
@@ -37,7 +49,7 @@ function CryptoPricesWidget() {
         </small>
       </div>
       {err && <div className="error-banner" style={{ marginTop: '0.5rem' }}>{err}</div>}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginTop: '0.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginTop: '0.5rem' }}>
         {state.quotes.length === 0 ? (
           <p>Carregando cotações…</p>
         ) : (
@@ -63,41 +75,13 @@ function CryptoPricesWidget() {
 }
 
 export default function Dashboard() {
-  const { userEmail, token } = useAuth()
-  const [users, setUsers] = useState([])
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    let mounted = true
-    async function load() {
-      setError('')
-      try {
-        const data = await usuariosApi.list(token)
-        if (mounted) setUsers(data)
-      } catch (err) {
-        if (mounted) setError(err.message || 'Falha ao carregar usuários')
-      }
-    }
-    load()
-    return () => { mounted = false }
-  }, [token])
+  const { token } = useAuth()
   return (
     <div className="login-page page-with-topnav">
       <div className="login-card">
         <h1 className="login-title">Dashboard</h1>
         {/* Widget de preços de criptomoedas (atualiza a cada 15s) */}
         <CryptoPricesWidget />
-        {error && <div className="error-banner">{error}</div>}
-        {!error && (
-          <div>
-            <h2>Usuários</h2>
-            <ul>
-              {users.map((u) => (
-                <li key={u.usuId}>{u.nome} — {u.email}</li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
     </div>
   )

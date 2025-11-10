@@ -281,7 +281,7 @@ export default function Wallet() {
 
         {/* Portfolio by Crypto */}
         <div className="wallet-card">
-          <h2 className="section-title">Portfolio por Criptomoeda</h2>
+          <h2 className="section-title">Carteira de Criptomoeda</h2>
           {holdings.length === 0 ? (
             <div className="empty">Nenhuma transação encontrada. Adicione sua primeira transação!</div>
           ) : (

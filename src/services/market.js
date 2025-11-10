@@ -6,13 +6,9 @@ const BFF_BASE_URL =
   'http://localhost:5299';
 
 export async function getQuotes(symbols = []) {
-  const list = Array.isArray(symbols) ? symbols : String(symbols).split(',');
-  // Evita enviar "symbols=" vazio, que alguns gateways tratam como requisição inválida (400)
-  const params = new URLSearchParams();
-  const joined = list.filter(Boolean).join(',');
-  if (joined) params.set('symbols', joined);
-  const url = `${BFF_BASE_URL}/api/market/quotes${params.toString() ? `?${params.toString()}` : ''}`;
-  const res = await fetch(url, {
+  const list = Array.isArray(symbols) ? symbols.filter(Boolean) : String(symbols).split(',').filter(Boolean);
+  const qs = list.length ? `?symbols=${encodeURIComponent(list.join(','))}` : '';
+  const res = await fetch(`${BFF_BASE_URL}/api/market/quotes${qs}`, {
     method: 'GET',
     headers: { 'Accept': 'application/json' },
   });

@@ -21,6 +21,22 @@ export default function Wallet() {
   const [err, setErr] = useState('')
   // Estado mínimo: sem efeitos colaterais extras
 
+  // Lista fixa de criptomoedas conhecidas (exibição), usando cotações reais da Function
+  const COINS = useMemo(() => [
+    'BTCUSDT',
+    'ETHUSDT',
+    'XRPUSDT',
+    'SOLUSDT',
+    'DOGEUSDT',
+    'ADAUSDT',
+    'LINKUSDT',
+    'DOTUSDT',
+    'UNIUSDT',
+    'LTCUSDT',
+    'MATICUSDT',
+    'JUPUSDT'
+  ], [])
+
   // holdings: { symbol, quantity, invested, avgPrice }
   const [holdings, setHoldings] = useState(() => {
     try {
@@ -73,7 +89,7 @@ export default function Wallet() {
     let timer = null
     async function fetchOnce() {
       try {
-        const data = await getQuotes([])
+        const data = await getQuotes()
         if (!mounted) return
         setQuotes(data.quotes || [])
         setLastAt(new Date())
@@ -243,8 +259,7 @@ export default function Wallet() {
               <div className="input select-wrapper">
                 <select className="select-input" value={symbol} onChange={(e)=>setSymbol(e.target.value)} aria-label="Selecionar criptomoeda">
                   <option value="">Selecione uma criptomoeda</option>
-                  {quotes.map(q => {
-                    const sym = q.symbol.toUpperCase()
+                  {COINS.map(sym => {
                     const short = sym.endsWith('USDT') ? sym.replace('USDT','') : sym
                     return <option key={sym} value={sym}>{short}</option>
                   })}

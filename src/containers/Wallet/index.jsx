@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { walletApi } from '../../services/wallet.js'
 
 const COINS = [
   { symbol: 'BTC', name: 'Bitcoin', price: 68000 },
@@ -46,12 +47,35 @@ export default function Wallet() {
     } catch {}
   }, [holdings])
 
-  // Limpa carteira quando usuário desloga (token vazio)
+  // Sincroniza alterações locais com o MS-Wallet (quando autenticado)
   useEffect(() => {
-    if (!token) {
-      setHoldings([])
-      try { localStorage.removeItem('wallet_holdings') } catch {}
+    if (!token) return
+    try {
+      walletApi.updateMyWallet({ holdings }, token).catch(() => {})
+    } catch {}
+  }, [holdings, token])
+
+  // Carrega/limpa carteira ao logar/deslogar e sincroniza com MS-Wallet
+  useEffect(() => {
+    let cancelled = false
+    async function run() {
+      if (!token) {
+        setHoldings([])
+        try { localStorage.removeItem('wallet_holdings') } catch {}
+        return
+      }
+      try {
+        const doc = await walletApi.getMyWallet(token)
+        const serverHoldings = Array.isArray(doc?.portfolio?.holdings) ? doc.portfolio.holdings : []
+        if (!cancelled) setHoldings(serverHoldings)
+      } catch (err) {
+        // 404: sem carteira criada ainda, mantém local
+        // outras falhas: ignora e usa localStorage
+        // console.warn('Wallet sync error:', err)
+      }
     }
+    run()
+    return () => { cancelled = true }
   }, [token])
 
   const selected = useMemo(() => COINS.find(c => c.symbol === symbol) || null, [symbol])
@@ -155,6 +179,8 @@ export default function Wallet() {
         const parsed = JSON.parse(reader.result)
         if (Array.isArray(parsed)) setHoldings(parsed)
         else if (Array.isArray(parsed.holdings)) setHoldings(parsed.holdings)
+        // sincroniza após importação
+        if (token) walletApi.updateMyWallet({ holdings: Array.isArray(parsed) ? parsed : parsed.holdings }, token).catch(()=>{})
       } catch {}
       if (fileInputRef.current) fileInputRef.current.value = ''
     }

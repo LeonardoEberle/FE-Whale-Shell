@@ -351,3 +351,37 @@ input, textarea, select, button {
 @media (min-width: 1440px) {
   .login-card { width: clamp(560px, 32vw, 720px); }
 }
+
+/* Dashboard: grid e cards de criptomoedas */
+.crypto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+.crypto-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+  padding: 0.9rem 1rem;
+  color: var(--text);
+}
+.crypto-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.crypto-symbol {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.crypto-price {
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+.crypto-meta { margin-top: 0.35rem; opacity: 0.85; }
+.crypto-meta small { color: #bfe5f2; }
+.crypto-meta small.stale { color: #ffcf85; }

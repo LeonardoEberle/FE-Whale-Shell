@@ -40,7 +40,7 @@ function CryptoPricesWidget() {
   }, [symbols])
 
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: '0.75rem', marginBottom: '1rem' }}>
+    <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <strong>Criptomoedas</strong>
         <small>
@@ -49,22 +49,20 @@ function CryptoPricesWidget() {
         </small>
       </div>
       {err && <div className="error-banner" style={{ marginTop: '0.5rem' }}>{err}</div>}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginTop: '0.5rem' }}>
+      <div className="crypto-grid">
         {state.quotes.length === 0 ? (
           <p>Carregando cotações…</p>
         ) : (
           state.quotes.map((q) => (
-            <div key={q.symbol} style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: 6, padding: '0.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontWeight: 600 }}>{q.symbol.replace('USDT','')}</span>
-                <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <div key={q.symbol} className="crypto-card">
+              <div className="crypto-row">
+                <span className="crypto-symbol">{q.symbol.replace('USDT','')}</span>
+                <span className="crypto-price">
                   {Number(q.price).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 })}
                 </span>
               </div>
-              <div style={{ marginTop: 4 }}>
-                <small style={{ color: q.stale ? '#b26b00' : '#666' }}>
-                  {q.stale ? 'stale' : 'ok'} · {new Date(q.updatedAt).toLocaleTimeString()}
-                </small>
+              <div className="crypto-meta">
+                <small className={q.stale ? 'stale' : ''}>{q.stale ? 'stale' : 'ok'} · {new Date(q.updatedAt).toLocaleTimeString()}</small>
               </div>
             </div>
           ))
@@ -77,11 +75,13 @@ function CryptoPricesWidget() {
 export default function Dashboard() {
   const { token } = useAuth()
   return (
-    <div className="login-page page-with-topnav">
-      <div className="login-card">
-        <h1 className="login-title">Dashboard</h1>
-        {/* Widget de preços de criptomoedas (atualiza a cada 15s) */}
-        <CryptoPricesWidget />
+    <div className="wallet-page page-with-topnav">
+      <div className="wallet-container">
+        <div className="wallet-card">
+          <h1 className="section-title">Dashboard</h1>
+          {/* Widget de preços de criptomoedas (atualiza a cada 15s) */}
+          <CryptoPricesWidget />
+        </div>
       </div>
     </div>
   )

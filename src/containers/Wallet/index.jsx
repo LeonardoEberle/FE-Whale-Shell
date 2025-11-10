@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useAuth } from '../../context/AuthContext.jsx'
 
 const COINS = [
   { symbol: 'BTC', name: 'Bitcoin', price: 68000 },
@@ -18,6 +19,7 @@ function fmtUSD(n) {
 }
 
 export default function Wallet() {
+  const { token } = useAuth()
   const [type, setType] = useState('buy')
   const [symbol, setSymbol] = useState('')
   const [qty, setQty] = useState('0.00000000')
@@ -43,6 +45,14 @@ export default function Wallet() {
       localStorage.setItem('wallet_holdings', JSON.stringify(holdings))
     } catch {}
   }, [holdings])
+
+  // Limpa carteira quando usuário desloga (token vazio)
+  useEffect(() => {
+    if (!token) {
+      setHoldings([])
+      try { localStorage.removeItem('wallet_holdings') } catch {}
+    }
+  }, [token])
 
   const selected = useMemo(() => COINS.find(c => c.symbol === symbol) || null, [symbol])
   const unitPrice = selected?.price ?? 0

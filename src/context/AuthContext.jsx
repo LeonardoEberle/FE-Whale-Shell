@@ -25,7 +25,22 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:logout', onAutoLogout);
   }, []);
 
-  const value = useMemo(() => ({ token, setToken, userEmail, setUserEmail, userName, setUserName, logout: () => { setToken(''); setUserEmail(''); setUserName(''); } }), [token, userEmail, userName]);
+  const value = useMemo(() => ({
+    token,
+    setToken,
+    userEmail,
+    setUserEmail,
+    userName,
+    setUserName,
+    logout: () => {
+      // Limpa dados de autenticação
+      setToken('');
+      setUserEmail('');
+      setUserName('');
+      // Limpa carteira armazenada localmente
+      try { localStorage.removeItem('wallet_holdings'); } catch {}
+    }
+  }), [token, userEmail, userName]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

@@ -1,23 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { walletApi } from '../../services/wallet.js'
+import { getQuotes } from '../../services/market.js'
 
-const COINS = [
-  { symbol: 'BTC', name: 'Bitcoin', price: 68000 },
-  { symbol: 'ETH', name: 'Ethereum', price: 3800 },
-  { symbol: 'SOL', name: 'Solana', price: 150 },
-  { symbol: 'ADA', name: 'Cardano', price: 0.45 },
-  { symbol: 'MATIC', name: 'Polygon', price: 0.75 },
-  { symbol: 'XRP', name: 'XRP', price: 0.65 },
-  { symbol: 'DOGE', name: 'Dogecoin', price: 0.12 },
-  { symbol: 'DOT', name: 'Polkadot', price: 5.25 },
-  { symbol: 'AVAX', name: 'Avalanche', price: 35 },
-  { symbol: 'LINK', name: 'Chainlink', price: 14.2 }
-]
-
-function fmtUSD(n) {
-  return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-}
+function fmtUSD(n) { return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }
 
 export default function Wallet() {
   const { token } = useAuth()
@@ -30,6 +16,9 @@ export default function Wallet() {
   const [modalMsg, setModalMsg] = useState('Transação registrada com sucesso.')
   const modalTimerRef = useRef(null)
   const [showNewTx, setShowNewTx] = useState(false)
+  const [quotes, setQuotes] = useState([])
+  const [lastAt, setLastAt] = useState(null)
+  const [err, setErr] = useState('')
   // Estado mínimo: sem efeitos colaterais extras
 
   // holdings: { symbol, quantity, invested, avgPrice }
@@ -78,8 +67,33 @@ export default function Wallet() {
     return () => { cancelled = true }
   }, [token])
 
-  const selected = useMemo(() => COINS.find(c => c.symbol === symbol) || null, [symbol])
-  const unitPrice = selected?.price ?? 0
+  // Carrega cotações reais do BFF (mesmo conjunto exibido no Dashboard)
+  useEffect(() => {
+    let mounted = true
+    let timer = null
+    async function fetchOnce() {
+      try {
+        const data = await getQuotes([])
+        if (!mounted) return
+        setQuotes(data.quotes || [])
+        setLastAt(new Date())
+        setErr('')
+      } catch (e) {
+        if (!mounted) return
+        setErr(e.message || 'Falha ao obter cotações')
+      }
+    }
+    fetchOnce()
+    timer = setInterval(fetchOnce, 15000)
+    return () => { mounted = false; if (timer) clearInterval(timer) }
+  }, [])
+
+  const quotesMap = useMemo(() => {
+    const m = new Map()
+    for (const q of quotes) m.set(q.symbol.toUpperCase(), Number(q.price) || 0)
+    return m
+  }, [quotes])
+  const unitPrice = quotesMap.get(symbol.toUpperCase()) ?? 0
   const qtyNum = (() => {
     const s = String(qty).trim().replace(',', '.')
     const n = parseFloat(s)
@@ -92,12 +106,12 @@ export default function Wallet() {
     let current = 0
     for (const h of holdings) {
       invested += h.invested
-      const coin = COINS.find(c => c.symbol === h.symbol)
-      current += (coin?.price ?? 0) * h.quantity
+      const p = quotesMap.get(h.symbol.toUpperCase()) ?? 0
+      current += p * h.quantity
     }
     const changePct = invested > 0 ? ((current - invested) / invested) * 100 : 0
     return { invested, current, changePct }
-  }, [holdings])
+  }, [holdings, quotesMap])
 
   function showModal(msg = 'Transação registrada com sucesso.') {
     setModalMsg(msg)
@@ -229,7 +243,11 @@ export default function Wallet() {
               <div className="input select-wrapper">
                 <select className="select-input" value={symbol} onChange={(e)=>setSymbol(e.target.value)} aria-label="Selecionar criptomoeda">
                   <option value="">Selecione uma criptomoeda</option>
-                  {COINS.map(c => <option key={c.symbol} value={c.symbol}>{c.symbol} - {c.name}</option>)}
+                  {quotes.map(q => {
+                    const sym = q.symbol.toUpperCase()
+                    const short = sym.endsWith('USDT') ? sym.replace('USDT','') : sym
+                    return <option key={sym} value={sym}>{short}</option>
+                  })}
                 </select>
               </div>
             </div>
@@ -299,8 +317,7 @@ export default function Wallet() {
               </thead>
               <tbody>
                 {holdings.map(h => {
-                  const coin = COINS.find(c=>c.symbol===h.symbol)
-                  const current = (coin?.price ?? 0) * h.quantity
+                  const current = (quotesMap.get(h.symbol.toUpperCase()) ?? 0) * h.quantity
                   const pl = current - h.invested
                   const plPct = h.invested>0 ? (pl / h.invested) * 100 : 0
                   return (

@@ -1,8 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { getQuotes } from '../../services/market.js'
 
 function CryptoPricesWidget() {
+  // Lista fixa como no dashboard antigo, com UNI/JUP no lugar de AVAX/TRX
+  const symbols = useMemo(() => [
+    'BTCUSDT',
+    'ETHUSDT',
+    'SOLUSDT',
+    'ADAUSDT',
+    'MATICUSDT',
+    'XRPUSDT',
+    'DOGEUSDT',
+    'DOTUSDT',
+    'UNIUSDT',
+    'LINKUSDT',
+    'LTCUSDT',
+    'JUPUSDT'
+  ], [])
   const [state, setState] = useState({ quotes: [], partial: false, lastAt: null })
   const [err, setErr] = useState('')
 
@@ -11,7 +26,7 @@ function CryptoPricesWidget() {
     let timer = null
     async function fetchOnce() {
       try {
-        const data = await getQuotes()
+        const data = await getQuotes(symbols)
         if (!mounted) return
         setState({ quotes: data.quotes || [], partial: !!data.partial, lastAt: new Date() })
         setErr('')
@@ -23,7 +38,7 @@ function CryptoPricesWidget() {
     fetchOnce()
     timer = setInterval(fetchOnce, 15000)
     return () => { mounted = false; if (timer) clearInterval(timer) }
-  }, [])
+  }, [symbols])
 
   return (
     <div>

@@ -21,6 +21,19 @@ export default function Wallet() {
   const [err, setErr] = useState('')
   // Estado mínimo: sem efeitos colaterais extras
 
+  // Normaliza símbolos curtos (BTC, ETH, ...) para o padrão usado nas cotações (BTCUSDT, ...)
+  const normalizeSymbol = (sym) => {
+    if (!sym) return ''
+    const s = String(sym).toUpperCase()
+    if (s.endsWith('USDT')) return s
+    const map = {
+      BTC: 'BTCUSDT', ETH: 'ETHUSDT', XRP: 'XRPUSDT', SOL: 'SOLUSDT', DOGE: 'DOGEUSDT',
+      ADA: 'ADAUSDT', LINK: 'LINKUSDT', DOT: 'DOTUSDT', UNI: 'UNIUSDT', LTC: 'LTCUSDT',
+      MATIC: 'MATICUSDT', JUP: 'JUPUSDT'
+    }
+    return map[s] || s
+  }
+
   // Lista fixa de criptomoedas conhecidas (exibição), usando cotações reais da Function
   const COINS = useMemo(() => [
     'BTCUSDT',
@@ -41,7 +54,17 @@ export default function Wallet() {
   const [holdings, setHoldings] = useState(() => {
     try {
       const raw = localStorage.getItem('wallet_holdings')
-      if (raw) return JSON.parse(raw)
+      if (raw) {
+        const arr = JSON.parse(raw)
+        if (Array.isArray(arr)) {
+          // Normaliza símbolos armazenados anteriormente sem sufixo USDT
+          return arr.map(h => ({
+            ...h,
+            symbol: normalizeSymbol(h?.symbol)
+          }))
+        }
+        return arr
+      }
     } catch {}
     return []
   })
@@ -72,7 +95,12 @@ export default function Wallet() {
       try {
         const doc = await walletApi.getMyWallet(token)
         const serverHoldings = Array.isArray(doc?.portfolio?.holdings) ? doc.portfolio.holdings : []
-        if (!cancelled) setHoldings(serverHoldings)
+        // Normaliza possível formato antigo (BTC → BTCUSDT)
+        const normalized = serverHoldings.map(h => ({
+          ...h,
+          symbol: normalizeSymbol(h?.symbol)
+        }))
+        if (!cancelled) setHoldings(normalized)
       } catch (err) {
         // 404: sem carteira criada ainda, mantém local
         // outras falhas: ignora e usa localStorage

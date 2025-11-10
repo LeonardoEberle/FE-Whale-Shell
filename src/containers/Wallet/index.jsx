@@ -117,7 +117,9 @@ export default function Wallet() {
     let timer = null
     async function fetchOnce() {
       try {
-        const data = await getQuotes()
+        // Em produção, versões antigas do BFF podem exigir o parâmetro 'symbols'.
+        // Enviamos a lista completa (mesma do Dashboard) para compatibilidade.
+        const data = await getQuotes(COINS)
         if (!mounted) return
         setQuotes(data.quotes || [])
         setLastAt(new Date())

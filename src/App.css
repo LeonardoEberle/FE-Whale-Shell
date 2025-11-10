@@ -41,6 +41,50 @@
   padding: 3rem 1.5rem;
 }
 
+/* Wallet page shares background */
+.wallet-page {
+  background: radial-gradient(1200px 600px at 30% 10%, var(--grad1), transparent),
+              radial-gradient(900px 500px at 80% 80%, var(--grad2), transparent),
+              var(--bg);
+  min-height: 100vh;
+  padding: 3rem 1.5rem;
+  color: var(--text);
+}
+
+.wallet-container { width: min(1100px, 95vw); margin: 0 auto; display: grid; gap: 1rem; }
+.wallet-header { display: flex; align-items: center; justify-content: space-between; }
+.wallet-header h1 { margin: 0; font-size: 1.6rem; }
+.wallet-actions { display: flex; gap: 0.6rem; }
+
+.wallet-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 18px 36px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+  padding: 1rem 1.2rem;
+}
+
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.summary-item { display: grid; gap: 0.25rem; }
+.summary-label { font-size: 0.9rem; opacity: 0.85; }
+.summary-value { font-size: 1.4rem; font-weight: 700; }
+.summary-value.pos { color: #74f58a; }
+.summary-value.neg { color: #ff9aa8; }
+
+.section-title { margin: 0 0 0.75rem 0; font-size: 1.2rem; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem 1rem; }
+.form-actions { margin-top: 0.8rem; display: flex; gap: 0.6rem; }
+.empty { padding: 0.75rem; opacity: 0.85; }
+
+.toggle { display: inline-flex; background: rgba(12, 36, 46, 0.86); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; overflow: hidden; }
+.toggle-btn { padding: 0.6rem 0.9rem; background: transparent; color: #d8e8f2; cursor: pointer; border: none; }
+.toggle-btn.active { background: rgba(46,134,245,0.25); }
+
+.table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.table th, .table td { text-align: left; padding: 0.6rem 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.table td.pos { color: #74f58a; }
+.table td.neg { color: #ff9aa8; }
+
 .login-card {
   width: clamp(420px, 38vw, 640px);
   max-width: 92vw;
@@ -87,6 +131,59 @@
   font-size: 0.95rem;
   outline: none;
 }
+
+/* Tornar o select legível dentro do tema escuro */
+.input select, .select-input {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 1.08rem; /* aumentar legibilidade */
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 2rem; /* espaço para o chevron */
+}
+
+/* Lista de opções com fundo escuro para melhor contraste */
+select option {
+  background: rgba(12, 36, 46, 0.96);
+  color: var(--text);
+  font-size: 1.05rem; /* opções mais legíveis */
+}
+
+/* Placeholder visual da primeira opção */
+select option[value=""] {
+  color: #9fbcc9;
+}
+
+/* Wrapper para chevron sem interferir no texto do select */
+.select-wrapper { position: relative; }
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eaf4f9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+.select-wrapper:focus-within::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bfe5f2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* Remover setas do input number (spin buttons) */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] { -moz-appearance: textfield; }
 
 /* Estado de foco mais sutil, sem borda grossa */
 .input:focus-within {
